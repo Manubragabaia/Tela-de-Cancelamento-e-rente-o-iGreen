@@ -789,16 +789,26 @@
             Motivo de Cancelamento <span class="required">*</span>
             <span class="badge badge-new">18 motivos</span>
           </div>
-          <div class="select-wrapper" id="motivoWrapper">
-            <div class="select-trigger" id="motivoSelect" onclick="toggleSelect('motivoSelect')">
-              <span class="placeholder" id="motivoValue">Selecione o motivo</span>
-              <span class="chevron">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <div class="select-wrapper" id="motivoWrapper" style="position:relative;">
+            <div style="display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);transition:all 0.15s;" id="motivoComboBox">
+              <input
+                type="text"
+                id="motivoInput"
+                placeholder="Selecione o motivo"
+                autocomplete="off"
+                style="flex:1;background:transparent;border:none;outline:none;padding:10px 14px;color:var(--text-primary);font-family:var(--font-main);font-size:13px;font-weight:500;cursor:text;"
+                oninput="filterMotivo(this.value)"
+                onfocus="openMotivoDropdown()"
+              />
+              <span id="motivoClearBtn" onclick="clearMotivo()" style="display:none;padding:0 8px;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;" title="Limpar">&times;</span>
+              <span onclick="toggleMotivoDropdown()" style="padding:0 12px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;border-left:1px solid var(--border);height:42px;transition:color 0.15s;" id="motivoChevronBtn">
+                <svg id="motivoChevronIcon" width="12" height="12" viewBox="0 0 12 12" fill="none" style="transition:transform 0.2s;">
                   <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
             </div>
-            <div class="dropdown-menu" id="motivoSelectMenu" style="max-height:240px;overflow-y:auto;">
+            <div id="motivoDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border-focus);border-top:none;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);max-height:220px;overflow-y:auto;z-index:200;box-shadow:var(--shadow);">
+              <div id="motivoNoResult" style="display:none;padding:12px 14px;font-size:12px;color:var(--text-muted);">Nenhum motivo encontrado</div>
               <div class="dropdown-item" onclick="selectMotivo('Insatisfação com atendimento da iGreen')"><span class="dot"></span>Insatisfação com atendimento da iGreen</div>
               <div class="dropdown-item" onclick="selectMotivo('Insatisfação com atendimento da distribuidora')"><span class="dot"></span>Insatisfação com atendimento da distribuidora</div>
               <div class="dropdown-item" onclick="selectMotivo('Instalação de placas solares')"><span class="dot"></span>Instalação de placas solares</div>
@@ -868,64 +878,49 @@
             Protocolo do Cancelamento <span class="required">*</span>
             <span class="badge badge-new">Via ExperIP</span>
           </div>
-          <div class="protocol-wrapper" id="protoWrapper">
-            <div class="protocol-trigger" id="protoTrigger" onclick="toggleProtocol()">
-              <span class="icon">📞</span>
-              <span id="protoTriggerText" style="flex:1;color:var(--text-muted)">Buscar protocolos da ligação...</span>
-              <span class="chevron" id="protoChevron">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <div class="protocol-wrapper" id="protoWrapper" style="position:relative;">
+            <div style="display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);transition:all 0.15s;" id="protoComboBox">
+              <span style="padding:0 10px;font-size:14px;flex-shrink:0;color:var(--text-muted);">📞</span>
+              <input
+                type="text"
+                id="protoInput"
+                placeholder="Buscar protocolos da ligação..."
+                autocomplete="off"
+                style="flex:1;background:transparent;border:none;outline:none;padding:10px 4px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;font-weight:500;cursor:text;"
+                oninput="filterProto(this.value); checkConfirmState();"
+                onfocus="openProtoDropdown()"
+              />
+              <span id="protoClearBtn" onclick="clearProto()" style="display:none;padding:0 8px;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;" title="Limpar">&times;</span>
+              <span onclick="toggleProtoDropdown()" style="padding:0 12px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;border-left:1px solid var(--border);height:42px;transition:color 0.15s;">
+                <svg id="protoChevronIcon" width="12" height="12" viewBox="0 0 12 12" fill="none" style="transition:transform 0.2s;">
                   <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
             </div>
-            <div class="protocol-menu" id="protoMenu">
-              <div class="protocol-loading" id="protoLoading">
-                <div class="spinner"></div>
-                <span>Buscando protocolos via API ExperIP...</span>
+            <div id="protoDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border-focus);border-top:none;border-bottom-left-radius:var(--radius-md);border-bottom-right-radius:var(--radius-md);overflow:hidden;z-index:200;box-shadow:var(--shadow);">
+              <div class="protocol-item" onclick="selectProtocol('72855485495498','04/03/2026','14:32','João Oliveira',0)">
+                <div class="protocol-icon">📞</div>
+                <div class="protocol-info">
+                  <div class="protocol-number"># 72855485495498</div>
+                  <div class="protocol-meta"><span>📅 04/03/2026</span><span>🕐 14:32</span><span>👤 João Oliveira</span></div>
+                </div>
+                <a class="protocol-link" href="#" onclick="event.stopPropagation();openAudio()">▶ Gravação</a>
               </div>
-              <div id="protoItems" style="display:none">
-                <div class="protocol-item" onclick="selectProtocol('72855485495498', '04/03/2026', '14:32', 'João Oliveira', 0)">
-                  <div class="protocol-icon">📞</div>
-                  <div class="protocol-info">
-                    <div class="protocol-number"># 72855485495498</div>
-                    <div class="protocol-meta">
-                      <span>📅 04/03/2026</span>
-                      <span>🕐 14:32</span>
-                      <span>👤 João Oliveira</span>
-                    </div>
-                  </div>
-                  <a class="protocol-link" href="#" onclick="event.stopPropagation();openAudio()">
-                    ▶ Gravação
-                  </a>
+              <div class="protocol-item" onclick="selectProtocol('72841230881200','02/03/2026','09:15','Maria Santos',1)">
+                <div class="protocol-icon">📞</div>
+                <div class="protocol-info">
+                  <div class="protocol-number"># 72841230881200</div>
+                  <div class="protocol-meta"><span>📅 02/03/2026</span><span>🕐 09:15</span><span>👤 Maria Santos</span></div>
                 </div>
-                <div class="protocol-item" onclick="selectProtocol('72841230881200', '02/03/2026', '09:15', 'Maria Santos', 1)">
-                  <div class="protocol-icon">📞</div>
-                  <div class="protocol-info">
-                    <div class="protocol-number"># 72841230881200</div>
-                    <div class="protocol-meta">
-                      <span>📅 02/03/2026</span>
-                      <span>🕐 09:15</span>
-                      <span>👤 Maria Santos</span>
-                    </div>
-                  </div>
-                  <a class="protocol-link" href="#" onclick="event.stopPropagation();openAudio()">
-                    ▶ Gravação
-                  </a>
+                <a class="protocol-link" href="#" onclick="event.stopPropagation();openAudio()">▶ Gravação</a>
+              </div>
+              <div class="protocol-item" onclick="selectProtocol('72799410223301','28/02/2026','16:45','Carlos Lima',2)">
+                <div class="protocol-icon">📞</div>
+                <div class="protocol-info">
+                  <div class="protocol-number"># 72799410223301</div>
+                  <div class="protocol-meta"><span>📅 28/02/2026</span><span>🕐 16:45</span><span>👤 Carlos Lima</span></div>
                 </div>
-                <div class="protocol-item" onclick="selectProtocol('72799410223301', '28/02/2026', '16:45', 'Carlos Lima', 2)">
-                  <div class="protocol-icon">📞</div>
-                  <div class="protocol-info">
-                    <div class="protocol-number"># 72799410223301</div>
-                    <div class="protocol-meta">
-                      <span>📅 28/02/2026</span>
-                      <span>🕐 16:45</span>
-                      <span>👤 Carlos Lima</span>
-                    </div>
-                  </div>
-                  <a class="protocol-link" href="#" onclick="event.stopPropagation();openAudio()">
-                    ▶ Gravação
-                  </a>
-                </div>
+                <a class="protocol-link" href="#" onclick="event.stopPropagation();openAudio()">▶ Gravação</a>
               </div>
             </div>
           </div>
@@ -1068,6 +1063,106 @@
     charCount: 0,
   };
 
+  // ── MOTIVO COMBO ──
+  function openMotivoDropdown() {
+    const dd = document.getElementById('motivoDropdown');
+    const box = document.getElementById('motivoComboBox');
+    const icon = document.getElementById('motivoChevronIcon');
+    dd.style.display = 'block';
+    icon.style.transform = 'rotate(180deg)';
+    box.style.borderColor = 'var(--border-focus)';
+    filterMotivo(document.getElementById('motivoInput').value);
+  }
+  function closeMotivoDropdown() {
+    const dd = document.getElementById('motivoDropdown');
+    const box = document.getElementById('motivoComboBox');
+    const icon = document.getElementById('motivoChevronIcon');
+    if (!dd) return;
+    dd.style.display = 'none';
+    icon.style.transform = '';
+    box.style.borderColor = 'var(--border)';
+  }
+  function toggleMotivoDropdown() {
+    const dd = document.getElementById('motivoDropdown');
+    if (dd.style.display === 'block') closeMotivoDropdown();
+    else { document.getElementById('motivoInput').focus(); openMotivoDropdown(); }
+  }
+  function filterMotivo(val) {
+    const items = document.querySelectorAll('#motivoDropdown .dropdown-item');
+    const q = val.toLowerCase().trim();
+    let any = false;
+    items.forEach(item => {
+      const show = item.textContent.toLowerCase().includes(q);
+      item.style.display = show ? '' : 'none';
+      if (show) any = true;
+    });
+    document.getElementById('motivoNoResult').style.display = any ? 'none' : 'block';
+    document.getElementById('motivoClearBtn').style.display = val ? 'flex' : 'none';
+    if (!val) state.motivo = null;
+  }
+  function clearMotivo() {
+    document.getElementById('motivoInput').value = '';
+    state.motivo = null;
+    filterMotivo('');
+    checkConfirmState();
+    document.getElementById('motivoInput').focus();
+  }
+  function selectMotivo(val) {
+    state.motivo = val;
+    document.getElementById('motivoInput').value = val;
+    document.getElementById('motivoClearBtn').style.display = 'flex';
+    document.querySelectorAll('#motivoDropdown .dropdown-item').forEach(item => {
+      item.classList.toggle('selected', item.textContent.trim() === val);
+    });
+    closeMotivoDropdown();
+    checkConfirmState();
+  }
+
+  // ── PROTO COMBO ──
+  function openProtoDropdown() {
+    const dd = document.getElementById('protoDropdown');
+    const box = document.getElementById('protoComboBox');
+    const icon = document.getElementById('protoChevronIcon');
+    dd.style.display = 'block';
+    icon.style.transform = 'rotate(180deg)';
+    box.style.borderColor = 'var(--border-focus)';
+  }
+  function closeProtoDropdown() {
+    const dd = document.getElementById('protoDropdown');
+    const box = document.getElementById('protoComboBox');
+    const icon = document.getElementById('protoChevronIcon');
+    if (!dd) return;
+    dd.style.display = 'none';
+    icon.style.transform = '';
+    box.style.borderColor = 'var(--border)';
+  }
+  function toggleProtoDropdown() {
+    const dd = document.getElementById('protoDropdown');
+    if (dd.style.display === 'block') closeProtoDropdown();
+    else { document.getElementById('protoInput').focus(); openProtoDropdown(); }
+  }
+  function filterProto(val) {
+    document.getElementById('protoClearBtn').style.display = val ? 'flex' : 'none';
+    state.protocolo = val || null;
+  }
+  function clearProto() {
+    document.getElementById('protoInput').value = '';
+    state.protocolo = null;
+    document.getElementById('protoClearBtn').style.display = 'none';
+    checkConfirmState();
+    document.getElementById('protoInput').focus();
+  }
+  function selectProtocol(num, date, time, agent, idx) {
+    state.protocolo = num;
+    document.getElementById('protoInput').value = '# ' + num + '  ·  ' + date + '  ·  ' + time + '  ·  ' + agent;
+    document.getElementById('protoClearBtn').style.display = 'flex';
+    document.querySelectorAll('#protoDropdown .protocol-item').forEach((el, i) => {
+      el.style.background = i === idx ? 'var(--green-muted)' : '';
+    });
+    closeProtoDropdown();
+    checkConfirmState();
+  }
+
   // ── SELECT GENERIC ──
   function toggleSelect(id) {
     const trigger = document.getElementById(id);
@@ -1083,16 +1178,17 @@
   function closeAll() {
     document.querySelectorAll('.select-trigger.open').forEach(el => el.classList.remove('open'));
     document.querySelectorAll('.dropdown-menu.open').forEach(el => el.classList.remove('open'));
-    const pt = document.getElementById('protoTrigger');
-    const pc = document.getElementById('protoChevron');
-    const pm = document.getElementById('protoMenu');
-    if (pt) pt.classList.remove('open');
-    if (pc) pc.style.transform = '';
-    if (pm) pm.classList.remove('open');
+    closeMotivoDropdown();
+    closeProtoDropdown();
   }
 
   document.addEventListener('click', e => {
-    if (!e.target.closest('.select-wrapper') && !e.target.closest('.protocol-wrapper')) closeAll();
+    if (!e.target.closest('#motivoWrapper') && !e.target.closest('#motivoComboBox')) closeMotivoDropdown();
+    if (!e.target.closest('#protoWrapper') && !e.target.closest('#protoComboBox')) closeProtoDropdown();
+    if (!e.target.closest('.select-wrapper')) {
+      document.querySelectorAll('.select-trigger.open').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.dropdown-menu.open').forEach(el => el.classList.remove('open'));
+    }
   });
 
   function selectType(val) {
@@ -1127,28 +1223,19 @@
       : '<span class="check">✓</span> Confirmar Cancelamento';
 
     // Reset motivo/estrategia values
-    document.getElementById('motivoValue').textContent = 'Selecione o motivo';
-    document.getElementById('motivoValue').className = 'placeholder';
+    document.getElementById('motivoInput').value = '';
+    document.getElementById('motivoClearBtn').style.display = 'none';
+    state.motivo = null;
     document.getElementById('estrategiaValue').textContent = 'Selecione a estratégia';
     document.getElementById('estrategiaValue').className = 'placeholder';
-    document.querySelectorAll('#motivoSelectMenu .dropdown-item').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('#motivoDropdown .dropdown-item').forEach(el => el.classList.remove('selected'));
     document.querySelectorAll('#estrategiaSelectMenu .dropdown-item').forEach(el => el.classList.remove('selected'));
 
     checkConfirmState();
     closeAll();
   }
 
-  function selectMotivo(val) {
-    state.motivo = val;
-    const el = document.getElementById('motivoValue');
-    el.textContent = val;
-    el.className = 'value';
-    document.querySelectorAll('#motivoSelectMenu .dropdown-item').forEach(item => {
-      item.classList.toggle('selected', item.textContent.trim() === val);
-    });
-    closeAll();
-    checkConfirmState();
-  }
+  // selectMotivo movido para combo acima
 
   function selectEstrategia(val) {
     state.estrategia = val;
@@ -1194,48 +1281,7 @@
   }
 
   // ── PROTOCOL DROPDOWN ──
-  function toggleProtocol() {
-    const trigger = document.getElementById('protoTrigger');
-    const menu = document.getElementById('protoMenu');
-    const chevron = document.getElementById('protoChevron');
-    const isOpen = trigger.classList.contains('open');
-    closeAll();
-    if (!isOpen) {
-      trigger.classList.add('open');
-      menu.classList.add('open');
-      if (chevron) chevron.style.transform = 'rotate(180deg)';
-      // Simulate API loading
-      if (!state.protocolo) {
-        document.getElementById('protoLoading').style.display = 'flex';
-        document.getElementById('protoItems').style.display = 'none';
-        setTimeout(() => {
-          document.getElementById('protoLoading').style.display = 'none';
-          document.getElementById('protoItems').style.display = 'block';
-        }, 1200);
-      }
-    }
-  }
-
-  function selectProtocol(num, date, time, agent, idx) {
-    state.protocolo = num;
-    const trigger = document.getElementById('protoTrigger');
-    trigger.innerHTML = `
-      <div class="protocol-selected-display">
-        <span style="font-size:14px">📞</span>
-        <span class="num"># ${num}</span>
-        <span style="font-size:10px;color:var(--text-muted)">${date} · ${time} · ${agent}</span>
-        <a class="link-btn" href="#" onclick="event.stopPropagation();openAudio()">
-          ▶ Ouvir gravação
-        </a>
-      </div>
-    `;
-    trigger.onclick = () => {};
-    document.querySelectorAll('.protocol-item').forEach((el, i) => {
-      el.classList.toggle('selected', i === idx);
-    });
-    closeAll();
-    checkConfirmState();
-  }
+  // toggleProtocol e selectProtocol movidos para combo acima
 
   // ── CONFIRM STATE ──
   function checkConfirmState() {
